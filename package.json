@@ -1,0 +1,33 @@
+{
+  "name": "roseguard",
+  "version": "1.0.0",
+  "description": "Intelligent LLM-powered Minecraft bot",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/cli/index.ts",
+    "build": "tsc",
+    "dev": "tsx watch src/cli/index.ts"
+  },
+  "dependencies": {
+    "@google/genai": "latest",
+    "commander": "latest",
+    "dotenv": "latest",
+    "inquirer": "latest",
+    "mineflayer": "latest",
+    "mineflayer-armor-manager": "latest",
+    "mineflayer-collectblock": "latest",
+    "mineflayer-pathfinder": "latest",
+    "mineflayer-pvp": "latest",
+    "openai": "latest",
+    "ws": "latest",
+    "yaml": "latest"
+  },
+  "devDependencies": {
+    "@types/inquirer": "latest",
+    "@types/node": "latest",
+    "@types/ws": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  }
+}
