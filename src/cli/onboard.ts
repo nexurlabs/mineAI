@@ -14,6 +14,7 @@ export async function onboard() {
         { name: "OpenAI", value: "openai" },
         { name: "Google Gemini", value: "gemini" },
         { name: "Anthropic", value: "anthropic" },
+        { name: "Groq", value: "groq" },
       ],
       default: config.llm.provider,
     },
@@ -27,10 +28,11 @@ export async function onboard() {
       type: "list",
       name: "model",
       message: "Which model do you want to use?",
-      choices: (answers) => {
+      choices: (answers: { provider: string }) => {
         if (answers.provider === "openai") return ["gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"];
         if (answers.provider === "gemini") return ["gemini-1.5-pro", "gemini-1.5-flash"];
         if (answers.provider === "anthropic") return ["claude-3-opus-20240229", "claude-3-sonnet-20240229", "claude-3-haiku-20240307"];
+        if (answers.provider === "groq") return ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768", "gemma2-9b-it"];
         return [];
       },
       default: config.llm.model,

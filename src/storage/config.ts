@@ -4,7 +4,7 @@ import yaml from "yaml";
 
 export interface RoseGuardConfig {
   llm: {
-    provider: "openai" | "gemini" | "anthropic";
+    provider: "openai" | "gemini" | "anthropic" | "groq";
     api_key: string;
     model: string;
   };

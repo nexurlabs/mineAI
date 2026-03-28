@@ -1,7 +1,9 @@
 import { BotManager } from "../bot/manager.js";
 import { LLMClient } from "./llm.js";
 import { RoseGuardConfig } from "../storage/config.js";
-import { goals } from "mineflayer-pathfinder";
+import pkg from "mineflayer-pathfinder";
+
+const { goals } = pkg;
 
 export class RoseGuardAgent {
   private manager: BotManager;

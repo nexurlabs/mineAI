@@ -1,10 +1,5 @@
 #!/usr/bin/env node
 import { Command } from "commander";
-import { onboard } from "./onboard.js";
-import { loadConfig } from "../storage/config.js";
-import { initWebSocketServer } from "../web/ws.js";
-import { BotManager } from "../bot/manager.js";
-import { RoseGuardAgent } from "../brain/agent.js";
 
 const program = new Command();
 
@@ -16,14 +11,20 @@ program
 program
   .command("onboard")
   .description("Setup the bot by adding API keys and Minecraft server address")
-  .action(() => {
-    onboard();
+  .action(async () => {
+    const { onboard } = await import("./onboard.js");
+    await onboard();
   });
 
 program
   .command("start")
   .description("Connect the bot to the server and spin up the local web dashboard")
-  .action(() => {
+  .action(async () => {
+    const { loadConfig } = await import("../storage/config.js");
+    const { initWebSocketServer } = await import("../web/ws.js");
+    const { BotManager } = await import("../bot/manager.js");
+    const { RoseGuardAgent } = await import("../brain/agent.js");
+
     const config = loadConfig();
     console.log("Starting RoseGuard... 🌹");
     
@@ -34,7 +35,7 @@ program
     const manager = new BotManager(config);
 
     // 3. Connect the Brain
-    const agent = new RoseGuardAgent(manager, config);
+    new RoseGuardAgent(manager, config);
   });
 
 program.parse(process.argv);
