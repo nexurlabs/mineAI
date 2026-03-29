@@ -89,18 +89,23 @@ main() {
   repo_dir="$(resolve_repo_dir)"
   cd "$repo_dir"
 
-  log "Installing mineAI dependencies"
-  npm install
+  log "Installing mineAI dependencies (this can take a minute)"
+  npm install --no-fund --no-audit --loglevel=error
 
   log "Building mineAI"
   npm run build
 
+  printf '\n==> Build finished. Next: onboarding will open interactively.\n' >&2
+  printf '==> If the terminal looks idle for a moment, wait — the prompt is loading.\n\n' >&2
   log "Launching mineAI onboarding"
   node --import tsx/esm src/cli/index.ts onboard
 
   printf '\nmineAI onboarding finished.\n'
   read -r -p 'Start mineAI now? [Y/n] ' start_now
   if [[ -z "${start_now}" || "${start_now}" =~ ^[Yy]$ ]]; then
+    printf '\n==> Starting mineAI...\n' >&2
+    printf '==> WebSocket server: ws://localhost:8080\n' >&2
+    printf '==> Watch this terminal for Minecraft connection logs.\n\n' >&2
     log "Starting mineAI"
     exec node --import tsx/esm src/cli/index.ts start
   fi

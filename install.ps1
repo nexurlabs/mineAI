@@ -42,17 +42,22 @@ Ensure-Command npm 'OpenJS.NodeJS.LTS'
 $RepoDir = Get-RepoDir
 Set-Location $RepoDir
 
-Write-Step 'Installing mineAI dependencies'
-npm install | Out-Host
+Write-Step 'Installing mineAI dependencies (this can take a minute)'
+npm install --no-fund --no-audit --loglevel=error | Out-Host
 
 Write-Step 'Building mineAI'
 npm run build | Out-Host
 
+Write-Host "`n==> Build finished. Next: onboarding will open interactively." -ForegroundColor Yellow
+Write-Host "==> If the terminal looks idle for a moment, wait — the prompt is loading.`n" -ForegroundColor Yellow
 Write-Step 'Launching mineAI onboarding'
 node --import tsx/esm src/cli/index.ts onboard
 
 $startNow = Read-Host "Start mineAI now? [Y/n]"
 if ([string]::IsNullOrWhiteSpace($startNow) -or $startNow -match '^[Yy]$') {
+  Write-Host "`n==> Starting mineAI..." -ForegroundColor Yellow
+  Write-Host "==> WebSocket server: ws://localhost:8080" -ForegroundColor Yellow
+  Write-Host "==> Watch this terminal for Minecraft connection logs.`n" -ForegroundColor Yellow
   Write-Step 'Starting mineAI'
   node --import tsx/esm src/cli/index.ts start
   exit $LASTEXITCODE
