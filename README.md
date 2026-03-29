@@ -23,6 +23,7 @@ These installers will:
 - install dependencies
 - build the project
 - launch onboarding automatically
+- offer to start RoseGuard immediately after onboarding
 
 ### What the installer does
 1. checks for Git and Node.js
@@ -30,6 +31,7 @@ These installers will:
 3. installs npm dependencies
 4. builds the TypeScript project
 5. launches onboarding automatically
+6. asks if you want to start RoseGuard immediately
 
 ---
 

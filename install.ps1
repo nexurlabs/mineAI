@@ -51,6 +51,13 @@ npm run build | Out-Host
 Write-Step 'Launching RoseGuard onboarding'
 node --import tsx/esm src/cli/index.ts onboard
 
+$startNow = Read-Host "Start RoseGuard now? [Y/n]"
+if ([string]::IsNullOrWhiteSpace($startNow) -or $startNow -match '^[Yy]$') {
+  Write-Step 'Starting RoseGuard'
+  node --import tsx/esm src/cli/index.ts start
+  exit $LASTEXITCODE
+}
+
 Write-Host "`nmineAI is installed. Next steps:" -ForegroundColor Green
 Write-Host "  cd $RepoDir"
 Write-Host "  node --import tsx/esm src/cli/index.ts start`n"

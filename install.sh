@@ -98,6 +98,13 @@ main() {
   log "Launching RoseGuard onboarding"
   node --import tsx/esm src/cli/index.ts onboard
 
+  printf '\nRoseGuard onboarding finished.\n'
+  read -r -p 'Start RoseGuard now? [Y/n] ' start_now
+  if [[ -z "${start_now}" || "${start_now}" =~ ^[Yy]$ ]]; then
+    log "Starting RoseGuard"
+    exec node --import tsx/esm src/cli/index.ts start
+  fi
+
   printf '\nmineAI is installed. Next steps:\n'
   printf '  cd %s\n' "$repo_dir"
   printf '  node --import tsx/esm src/cli/index.ts start\n\n'
