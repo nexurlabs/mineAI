@@ -24,6 +24,13 @@ These installers will:
 - build the project
 - launch onboarding automatically
 
+### What the installer does
+1. checks for Git and Node.js
+2. clones or updates mineAI into a default folder
+3. installs npm dependencies
+4. builds the TypeScript project
+5. launches onboarding automatically
+
 ---
 
 ## Manual Start
@@ -63,6 +70,21 @@ Still rough / future polish:
 - dashboard frontend is still minimal
 
 ---
+
+## Troubleshooting
+
+### Windows
+- Run the PowerShell command in **PowerShell**, not Command Prompt.
+- If `winget` is missing, install **App Installer** from the Microsoft Store first.
+- If Node.js was just installed, close and reopen PowerShell before retrying.
+- If script execution is blocked, run:
+  ```powershell
+  Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+  ```
+
+### Linux / macOS
+- If `node` or `npm` is missing, install a current LTS version and rerun the installer.
+- If onboarding exits because stdin closes, just rerun the installed command interactively.
 
 ## Development
 
