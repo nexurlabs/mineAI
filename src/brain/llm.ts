@@ -12,8 +12,7 @@ export class LLMClient {
 
   constructor(config: MineAIConfig) {
     this.config = config;
-    if (config.llm.provider === "openai" || config.llm.provider === "anthropic") {
-      // Anthropic is still not natively implemented here.
+    if (config.llm.provider === "openai") {
       this.openai = new OpenAI({ apiKey: config.llm.api_key });
     } else if (config.llm.provider === "groq") {
       this.openai = new OpenAI({
@@ -36,14 +35,17 @@ export class LLMClient {
         tool_choice: "auto",
       });
       return completion.choices[0].message;
-    } 
-    
+    }
+
     if (this.config.llm.provider === "gemini" && this.gemini) {
-      // Gemini equivalent
-      console.log("[mineAI LLM] Gemini call triggered (WIP)");
+      // Gemini support is a work-in-progress
+      console.warn("[mineAI LLM] Gemini provider is WIP — not yet functional.");
       return null;
     }
 
-    throw new Error("Unsupported or misconfigured LLM provider");
+    throw new Error(
+      `Unsupported or misconfigured LLM provider: "${this.config.llm.provider}". ` +
+      `Supported: openai, groq. Gemini is WIP.`
+    );
   }
 }
