@@ -1,7 +1,7 @@
 {
-  "name": "roseguard",
+  "name": "mineai",
   "version": "1.0.0",
-  "description": "Intelligent LLM-powered Minecraft bot",
+  "description": "mineAI — Intelligent LLM-powered Minecraft bot",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {

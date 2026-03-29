@@ -3,14 +3,14 @@ import { pathfinder, Movements } from "mineflayer-pathfinder";
 import { plugin as pvp } from "mineflayer-pvp";
 import { plugin as collectBlock } from "mineflayer-collectblock";
 import armorManager from "mineflayer-armor-manager";
-import { RoseGuardConfig } from "../storage/config.js";
+import { MineAIConfig } from "../storage/config.js";
 import { broadcastState } from "../web/ws.js";
 
 export class BotManager {
   public bot: mineflayer.Bot;
   
-  constructor(config: RoseGuardConfig) {
-    console.log(`[RoseGuard] Connecting to ${config.minecraft.host}:${config.minecraft.port}...`);
+  constructor(config: MineAIConfig) {
+    console.log(`[mineAI] Connecting to ${config.minecraft.host}:${config.minecraft.port}...`);
     this.bot = mineflayer.createBot({
       host: config.minecraft.host,
       port: config.minecraft.port,
@@ -29,8 +29,8 @@ export class BotManager {
 
   private registerEvents() {
     this.bot.once("spawn", () => {
-      console.log(`[RoseGuard] Spawned in as ${this.bot.username}`);
-      this.bot.chat("RoseGuard initialized. Waiting for commands...");
+      console.log(`[mineAI] Spawned in as ${this.bot.username}`);
+      this.bot.chat("mineAI initialized. Waiting for commands...");
       
       const defaultMove = new Movements(this.bot);
       this.bot.pathfinder.setMovements(defaultMove);
@@ -49,8 +49,8 @@ export class BotManager {
       broadcastState("chat", { username, message });
     });
 
-    this.bot.on("error", (err) => console.log(`[RoseGuard Error]: ${err}`));
-    this.bot.on("end", () => console.log(`[RoseGuard] Disconnected from server.`));
+    this.bot.on("error", (err) => console.log(`[mineAI Error]: ${err}`));
+    this.bot.on("end", () => console.log(`[mineAI] Disconnected from server.`));
   }
 
   public pushState() {

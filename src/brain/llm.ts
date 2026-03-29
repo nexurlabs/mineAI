@@ -1,16 +1,16 @@
 import { OpenAI } from "openai";
 import { GoogleGenAI } from "@google/genai";
 import type { ChatCompletionTool } from "openai/resources/chat/completions/completions";
-import { RoseGuardConfig } from "../storage/config.js";
+import { MineAIConfig } from "../storage/config.js";
 
 type Tool = ChatCompletionTool;
 
 export class LLMClient {
   private openai?: OpenAI;
   private gemini?: GoogleGenAI;
-  private config: RoseGuardConfig;
+  private config: MineAIConfig;
 
-  constructor(config: RoseGuardConfig) {
+  constructor(config: MineAIConfig) {
     this.config = config;
     if (config.llm.provider === "openai" || config.llm.provider === "anthropic") {
       // Anthropic is still not natively implemented here.
@@ -40,7 +40,7 @@ export class LLMClient {
     
     if (this.config.llm.provider === "gemini" && this.gemini) {
       // Gemini equivalent
-      console.log("[RoseGuard LLM] Gemini call triggered (WIP)");
+      console.log("[mineAI LLM] Gemini call triggered (WIP)");
       return null;
     }
 

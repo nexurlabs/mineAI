@@ -1,11 +1,11 @@
 import { BotManager } from "../bot/manager.js";
 import { LLMClient } from "./llm.js";
-import { RoseGuardConfig } from "../storage/config.js";
+import { MineAIConfig } from "../storage/config.js";
 import pkg from "mineflayer-pathfinder";
 
 const { goals } = pkg;
 
-export class RoseGuardAgent {
+export class MineAIAgent {
   private manager: BotManager;
   private llm: LLMClient;
 
@@ -56,7 +56,7 @@ export class RoseGuardAgent {
     }
   ];
 
-  constructor(manager: BotManager, config: RoseGuardConfig) {
+  constructor(manager: BotManager, config: MineAIConfig) {
     this.manager = manager;
     this.llm = new LLMClient(config);
 
@@ -81,7 +81,7 @@ export class RoseGuardAgent {
     const nearbyBlocks = bot.findBlocks({ matching: () => true, maxDistance: 5, count: 5 });
 
     return `
-      You are RoseGuard, an intelligent Minecraft Agent.
+      You are mineAI, an intelligent Minecraft agent.
       Your current status:
       - Health: ${health}/20
       - Hunger: ${food}/20
@@ -92,7 +92,7 @@ export class RoseGuardAgent {
   }
 
   public async processGoal(goalText: string) {
-    console.log(`[RoseGuard Agent] Processing Goal: ${goalText}`);
+    console.log(`[mineAI Agent] Processing Goal: ${goalText}`);
     const context = this.buildContext() + `\nUser Command: ${goalText}`;
     
     try {
@@ -106,12 +106,12 @@ export class RoseGuardAgent {
         this.manager.bot.chat(response.content);
       }
     } catch(err: any) {
-      console.error(`[RoseGuard Agent Error]`, err.message);
+      console.error(`[mineAI Agent Error]`, err.message);
     }
   }
 
   private async executeTool(name: string, args: any) {
-    console.log(`[RoseGuard Agent] Executing Tool: ${name}`, args);
+    console.log(`[mineAI Agent] Executing Tool: ${name}`, args);
     const bot = this.manager.bot;
 
     try {
@@ -131,7 +131,7 @@ export class RoseGuardAgent {
         }
       }
     } catch (err: any) {
-      console.error(`[RoseGuard Tool Error] ${err}`);
+      console.error(`[mineAI Tool Error] ${err}`);
       // In a full implementation, feed this error back to the LLM for recovery.
     }
   }

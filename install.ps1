@@ -18,7 +18,7 @@ function Ensure-Command($Command, $WingetId) {
 }
 
 function Get-RepoDir {
-  if ((Test-Path './package.json') -and (Select-String -Path './package.json' -Pattern '"name": "roseguard"' -Quiet)) {
+  if ((Test-Path './package.json') -and (Select-String -Path './package.json' -Pattern '"name": "mineai"' -Quiet)) {
     return (Get-Location).Path
   }
 
@@ -48,12 +48,12 @@ npm install | Out-Host
 Write-Step 'Building mineAI'
 npm run build | Out-Host
 
-Write-Step 'Launching RoseGuard onboarding'
+Write-Step 'Launching mineAI onboarding'
 node --import tsx/esm src/cli/index.ts onboard
 
-$startNow = Read-Host "Start RoseGuard now? [Y/n]"
+$startNow = Read-Host "Start mineAI now? [Y/n]"
 if ([string]::IsNullOrWhiteSpace($startNow) -or $startNow -match '^[Yy]$') {
-  Write-Step 'Starting RoseGuard'
+  Write-Step 'Starting mineAI'
   node --import tsx/esm src/cli/index.ts start
   exit $LASTEXITCODE
 }

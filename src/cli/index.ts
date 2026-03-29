@@ -4,8 +4,8 @@ import { Command } from "commander";
 const program = new Command();
 
 program
-  .name("roseguard")
-  .description("Intelligent LLM-powered Minecraft bot")
+  .name("mineai")
+  .description("mineAI — Intelligent LLM-powered Minecraft bot")
   .version("1.0.0");
 
 program
@@ -23,10 +23,10 @@ program
     const { loadConfig } = await import("../storage/config.js");
     const { initWebSocketServer } = await import("../web/ws.js");
     const { BotManager } = await import("../bot/manager.js");
-    const { RoseGuardAgent } = await import("../brain/agent.js");
+    const { MineAIAgent } = await import("../brain/agent.js");
 
     const config = loadConfig();
-    console.log("Starting RoseGuard... 🌹");
+    console.log("Starting mineAI... 🌹");
     
     // 1. Initialize Dashboard WebSocket Sync
     initWebSocketServer(8080);
@@ -35,7 +35,7 @@ program
     const manager = new BotManager(config);
 
     // 3. Connect the Brain
-    new RoseGuardAgent(manager, config);
+    new MineAIAgent(manager, config);
   });
 
 program.parse(process.argv);

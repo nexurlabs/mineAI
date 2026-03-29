@@ -65,7 +65,7 @@ ensure_node() {
 }
 
 resolve_repo_dir() {
-  if [[ -f "package.json" ]] && grep -q '"name": "roseguard"' package.json; then
+  if [[ -f "package.json" ]] && grep -q '"name": "mineai"' package.json; then
     pwd
     return
   fi
@@ -95,13 +95,13 @@ main() {
   log "Building mineAI"
   npm run build
 
-  log "Launching RoseGuard onboarding"
+  log "Launching mineAI onboarding"
   node --import tsx/esm src/cli/index.ts onboard
 
-  printf '\nRoseGuard onboarding finished.\n'
-  read -r -p 'Start RoseGuard now? [Y/n] ' start_now
+  printf '\nmineAI onboarding finished.\n'
+  read -r -p 'Start mineAI now? [Y/n] ' start_now
   if [[ -z "${start_now}" || "${start_now}" =~ ^[Yy]$ ]]; then
-    log "Starting RoseGuard"
+    log "Starting mineAI"
     exec node --import tsx/esm src/cli/index.ts start
   fi
 

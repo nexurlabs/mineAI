@@ -6,14 +6,14 @@ export function initWebSocketServer(port: number) {
   wss = new WebSocketServer({ port });
   
   wss.on("connection", (ws) => {
-    console.log("[RoseGuard WS] Dashboard connected!");
+    console.log("[mineAI WS] Dashboard connected!");
     ws.on("message", (msg) => {
-      console.log("[RoseGuard WS] Received from Dashboard:", msg.toString());
+      console.log("[mineAI WS] Received from Dashboard:", msg.toString());
       // Here we will handle remote control commands from dashboard
     });
   });
 
-  console.log(`[RoseGuard WS] WebSocket server listening on port ${port}`);
+  console.log(`[mineAI WS] WebSocket server listening on port ${port}`);
 }
 
 export function broadcastState(event: string, data: any) {

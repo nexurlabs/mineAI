@@ -1,8 +1,8 @@
 import inquirer from "inquirer";
-import { loadConfig, saveConfig, RoseGuardConfig } from "../storage/config.js";
+import { loadConfig, saveConfig, MineAIConfig } from "../storage/config.js";
 
 export async function onboard() {
-  console.log("Welcome to RoseGuard Onboarding Wizard! 🌹\n");
+  console.log("Welcome to mineAI Onboarding Wizard! 🌹\n");
   const config = loadConfig();
 
   const answers = await inquirer.prompt([
