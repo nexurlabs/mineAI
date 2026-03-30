@@ -45,6 +45,12 @@ Set-Location $RepoDir
 Write-Step 'Installing mineAI dependencies (this can take a minute)'
 npm install --no-fund --no-audit --loglevel=error | Out-Host
 
+Write-Step 'Building the Web Dashboard UI'
+Push-Location dashboard
+npm install --no-fund --no-audit --loglevel=error | Out-Host
+npm run build | Out-Host
+Pop-Location
+
 Write-Step 'Building mineAI'
 npm run build | Out-Host
 
