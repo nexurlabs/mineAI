@@ -7,6 +7,7 @@ export interface MineAIConfig {
     provider: "openai" | "gemini" | "anthropic" | "groq";
     api_key: string;
     model: string;
+    systemPrompt: string;
   };
   minecraft: {
     host: string;
@@ -23,6 +24,7 @@ const DEFAULT_CONFIG: MineAIConfig = {
     provider: "openai",
     api_key: "",
     model: "gpt-4o",
+    systemPrompt: "You are mineAI, an intelligent Minecraft agent. Use your tools to perform actions.",
   },
   minecraft: {
     host: "localhost",

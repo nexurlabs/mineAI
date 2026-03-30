@@ -8,6 +8,7 @@ const { goals } = pkg;
 export class MineAIAgent {
   private manager: BotManager;
   private llm: LLMClient;
+  private config: MineAIConfig;
 
   private availableTools = [
     {
@@ -59,9 +60,11 @@ export class MineAIAgent {
   constructor(manager: BotManager, config: MineAIConfig) {
     this.manager = manager;
     this.llm = new LLMClient(config);
+    this.config = config;
 
     // Bind event to process LLM thoughts on incoming chat
     this.manager.bot.on("chat", async (username, message) => {
+
       if (username === this.manager.bot.username) return;
       if (message.toLowerCase().includes("rose")) {
         await this.processGoal(message);
@@ -80,8 +83,11 @@ export class MineAIAgent {
     // Find nearby blocks
     const nearbyBlocks = bot.findBlocks({ matching: () => true, maxDistance: 5, count: 5 });
 
+    const systemContext = this.config.llm.systemPrompt || "You are mineAI, an intelligent Minecraft agent.";
+
     return `
-      You are mineAI, an intelligent Minecraft agent.
+      ${systemContext}
+      
       Your current status:
       - Health: ${health}/20
       - Hunger: ${food}/20

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "mineAI — Intelligent LLM-powered Minecraft bot",
   "main": "dist/index.js",
+  "bin": {
+    "mineai": "dist/cli/index.js"
+  },
   "type": "module",
   "scripts": {
     "start": "tsx src/cli/index.ts",
