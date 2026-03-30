@@ -31,7 +31,7 @@ program
     }
 
     const { loadConfig } = await import("../storage/config.js");
-    const { initWebSocketServer } = await import("../web/api.js").catch(() => import("../web/ws.js"));
+    const { initWebSocketServer } = await import("../web/ws.js");
     const { BotManager } = await import("../bot/manager.js");
     const { MineAIAgent } = await import("../brain/agent.js");
 
@@ -53,7 +53,7 @@ program
   .description("Internal hidden command for the daemon loop to execute")
   .action(async () => {
     const { loadConfig } = await import("../storage/config.js");
-    const { initWebSocketServer } = await import("../web/api.js").catch(() => import("../web/ws.js"));
+    const { initWebSocketServer } = await import("../web/ws.js");
     const { BotManager } = await import("../bot/manager.js");
     const { MineAIAgent } = await import("../brain/agent.js");
 
