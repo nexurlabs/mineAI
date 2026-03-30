@@ -62,26 +62,30 @@ export class MineAIAgent {
     this.llm = new LLMClient(config);
     this.config = config;
 
-    // Bind event to process LLM thoughts on incoming chat
-    this.manager.bot.on("chat", async (username, message) => {
-
-      if (username === this.manager.bot.username) return;
-      if (message.toLowerCase().includes("rose")) {
-        await this.processGoal(message);
+    // We wait briefly for the pipeline to detect the server and build the bot.
+    setTimeout(() => {
+      const bot = this.manager.bot;
+      if (bot) {
+        bot.on("chat", async (username, message) => {
+          if (username === bot.username) return;
+          if (message.toLowerCase().includes("rose")) {
+            await this.processGoal(message);
+          }
+        });
       }
-    });
+    }, 5000);
   }
 
   private buildContext(): string {
     const bot = this.manager.bot;
-    if (!bot.entity) return "Loading state...";
+    if (!bot || !bot.position) return "Loading state...";
 
-    const pos = bot.entity.position;
+    const pos = bot.position;
     const health = bot.health;
     const food = bot.food;
     
     // Find nearby blocks
-    const nearbyBlocks = bot.findBlocks({ matching: () => true, maxDistance: 5, count: 5 });
+    const nearbyBlocks = bot.findBlocks(5, 5);
 
     const systemContext = this.config.llm.systemPrompt || "You are mineAI, an intelligent Minecraft agent.";
 
@@ -109,7 +113,7 @@ export class MineAIAgent {
           await this.executeTool(toolCall.function.name, JSON.parse(toolCall.function.arguments));
         }
       } else if (response && response.content) {
-        this.manager.bot.chat(response.content);
+        this.manager.bot?.chat(response.content);
       }
     } catch(err: any) {
       console.error(`[mineAI Agent Error]`, err.message);
@@ -119,20 +123,19 @@ export class MineAIAgent {
   private async executeTool(name: string, args: any) {
     console.log(`[mineAI Agent] Executing Tool: ${name}`, args);
     const bot = this.manager.bot;
+    if (!bot) return;
 
     try {
       if (name === "chat") {
         bot.chat(args.message);
       } else if (name === "goTo") {
-        const goal = new goals.GoalBlock(args.x, args.y, args.z);
-        await bot.pathfinder.goto(goal);
+        await bot.goTo(args.x, args.y, args.z);
         bot.chat(`I have arrived at ${args.x}, ${args.y}, ${args.z}`);
       } else if (name === "attackEntity") {
-        const target = bot.nearestEntity((entity) => entity.name?.toLowerCase() === args.entityName.toLowerCase());
-        if (target) {
-          bot.pvp.attack(target);
+        try {
+          await bot.attackEntity(args.entityName);
           bot.chat(`Attacking ${args.entityName}!`);
-        } else {
+        } catch(e) {
           bot.chat(`I couldn't find any ${args.entityName} nearby.`);
         }
       }
