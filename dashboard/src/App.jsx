@@ -285,6 +285,17 @@ function ConfigPage({ showToast }) {
           <label>Trigger Word</label>
           <input type="text" value={config.llm.triggerWord || ''} onChange={e => updateLlm('triggerWord', e.target.value)} placeholder="rose" />
         </div>
+        <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
+          <input 
+            type="checkbox" 
+            checked={!!config.llm.enableChat} 
+            onChange={e => updateLlm('enableChat', e.target.checked)} 
+            style={{ width: 'auto', margin: 0, cursor: 'pointer' }}
+          />
+          <label style={{ margin: 0, cursor: 'pointer' }} onClick={() => updateLlm('enableChat', !config.llm.enableChat)}>
+            Enable Chat Listener (Turn off on busy servers to prevent spam)
+          </label>
+        </div>
       </div>
 
       <div className="card section-gap">

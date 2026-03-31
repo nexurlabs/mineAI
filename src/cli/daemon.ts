@@ -52,7 +52,13 @@ export function stopDaemon() {
           const { execSync } = require("child_process");
           execSync(`taskkill /pid ${pid} /T /F`);
       } else {
-          process.kill(parseInt(pid, 10), "SIGTERM");
+          try {
+              // Negating the PID kills the entire process group (since detached: true sets pgid)
+              process.kill(-parseInt(pid, 10), "SIGTERM");
+          } catch (err) {
+              // Fallback if the process group handle is invalid
+              process.kill(parseInt(pid, 10), "SIGTERM");
+          }
       }
       console.log(`🛑 Stopped mineAI daemon (PID: ${pid}).`);
     } catch(e) {

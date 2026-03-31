@@ -10,6 +10,7 @@ export interface MineAIConfig {
     systemPrompt: string;
     userPrompt: string;
     triggerWord: string;
+    enableChat: boolean;
   };
   minecraft: {
     host: string;
@@ -29,6 +30,7 @@ const DEFAULT_CONFIG: MineAIConfig = {
     systemPrompt: "You are mineAI, an intelligent Minecraft agent. Use your tools to perform actions.",
     userPrompt: "",
     triggerWord: "rose",
+    enableChat: false,
   },
   minecraft: {
     host: "localhost",

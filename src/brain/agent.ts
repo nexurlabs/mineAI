@@ -100,6 +100,7 @@ export class MineAIAgent {
     console.log(`[mineAI Agent] Brain attached to bot pipeline.`);
 
     bot.on("chat", async (username, message) => {
+      if (!this.config.llm.enableChat) return; // Feature disabled for safety
       if (username === bot.username) return;
       const trigger = this.config.llm.triggerWord || "rose";
       if (message.toLowerCase().includes(trigger.toLowerCase())) {
