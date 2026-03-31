@@ -36,6 +36,7 @@ config.yaml
 # Java/Forge Build
 jdk17/
 jdk17.zip
+forge-mdk.zip
 forge-companion/build/
 forge-companion/.gradle/
 forge-companion/run/

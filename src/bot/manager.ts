@@ -5,12 +5,14 @@ import { broadcastState } from "../web/ws.js";
 import { IBot } from "./types.js";
 import { VanillaBot } from "./vanilla.js";
 import { ForgeBot } from "./forge.js";
+import { EventEmitter } from "events";
 
-export class BotManager {
+export class BotManager extends EventEmitter {
   public bot: IBot | null = null;
   private config: MineAIConfig;
 
   constructor(config: MineAIConfig) {
+    super();
     this.config = config;
     this.initializePipeline();
   }
@@ -45,6 +47,9 @@ export class BotManager {
       this.bot = new ForgeBot(this.config);
     }
     this.registerEvents();
+    
+    // Emit "ready" so the agent (brain) can safely attach listeners
+    this.emit("ready", this.bot);
   }
 
   private registerEvents() {

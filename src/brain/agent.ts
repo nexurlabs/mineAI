@@ -1,14 +1,38 @@
 import { BotManager } from "../bot/manager.js";
 import { LLMClient } from "./llm.js";
 import { MineAIConfig } from "../storage/config.js";
+import { IBot } from "../bot/types.js";
 import pkg from "mineflayer-pathfinder";
 
 const { goals } = pkg;
+
+/**
+ * Built-in system prompt — always prepended before user prompt.
+ * This is the permanent "identity" of the bot, similar to Rica's built-in persona.
+ * Users can customize behavior via userPrompt in the dashboard, but this core
+ * identity is always present.
+ */
+const BUILT_IN_PROMPT = `You are mineAI, an intelligent Minecraft bot created by NexurLabs.
+
+Your role:
+- You live inside a Minecraft server as a player.
+- You respond to chat messages that mention "rose" (your trigger word).
+- You can perform in-game actions using tool calls: chat, goTo, and attackEntity.
+- You are helpful, concise, and aware of your in-game surroundings.
+
+Rules:
+- Always use tools when a player asks you to do something in-game (move, attack, chat).
+- If a player just wants to talk, respond with conversational text (no tool call).
+- Keep chat messages SHORT — Minecraft chat has a 256 character limit.
+- Be aware of your health and hunger levels. If critically low, mention it.
+- When pathfinding, confirm the destination after arriving.
+- Be friendly but not overly chatty.`;
 
 export class MineAIAgent {
   private manager: BotManager;
   private llm: LLMClient;
   private config: MineAIConfig;
+  private bot: IBot | null = null;
 
   private availableTools = [
     {
@@ -62,43 +86,48 @@ export class MineAIAgent {
     this.llm = new LLMClient(config);
     this.config = config;
 
-    // We wait briefly for the pipeline to detect the server and build the bot.
-    setTimeout(() => {
-      const bot = this.manager.bot;
-      if (bot) {
-        bot.on("chat", async (username, message) => {
-          if (username === bot.username) return;
-          if (message.toLowerCase().includes("rose")) {
-            await this.processGoal(message);
-          }
-        });
+    // Event-based: wait for the bot to be ready instead of a fragile setTimeout
+    if (manager.bot) {
+      this.attachToBot(manager.bot);
+    }
+    manager.on("ready", (bot: IBot) => {
+      this.attachToBot(bot);
+    });
+  }
+
+  private attachToBot(bot: IBot) {
+    this.bot = bot;
+    console.log(`[mineAI Agent] Brain attached to bot pipeline.`);
+
+    bot.on("chat", async (username, message) => {
+      if (username === bot.username) return;
+      const trigger = this.config.llm.triggerWord || "rose";
+      if (message.toLowerCase().includes(trigger.toLowerCase())) {
+        await this.processGoal(message);
       }
-    }, 5000);
+    });
   }
 
   private buildContext(): string {
-    const bot = this.manager.bot;
+    const bot = this.bot;
     if (!bot || !bot.position) return "Loading state...";
 
     const pos = bot.position;
     const health = bot.health;
     const food = bot.food;
-    
-    // Find nearby blocks
-    const nearbyBlocks = bot.findBlocks(5, 5);
 
-    const systemContext = this.config.llm.systemPrompt || "You are mineAI, an intelligent Minecraft agent.";
+    // Combine: built-in prompt + user prompt + live game state
+    const userPrompt = this.config.llm.userPrompt || "";
 
-    return `
-      ${systemContext}
-      
-      Your current status:
-      - Health: ${health}/20
-      - Hunger: ${food}/20
-      - Location: X:${Math.floor(pos.x)} Y:${Math.floor(pos.y)} Z:${Math.floor(pos.z)}
-      
-      You can use tools to perform your actions. If you don't need a tool, just respond with conversational text.
-    `;
+    return `${BUILT_IN_PROMPT}
+
+${userPrompt ? `Additional instructions from the server operator:\n${userPrompt}\n` : ""}
+Your current status:
+- Health: ${health}/20
+- Hunger: ${food}/20
+- Location: X:${Math.floor(pos.x)} Y:${Math.floor(pos.y)} Z:${Math.floor(pos.z)}
+
+You can use tools to perform your actions. If you don't need a tool, just respond with conversational text.`;
   }
 
   public async processGoal(goalText: string) {
@@ -113,7 +142,7 @@ export class MineAIAgent {
           await this.executeTool(toolCall.function.name, JSON.parse(toolCall.function.arguments));
         }
       } else if (response && response.content) {
-        this.manager.bot?.chat(response.content);
+        this.bot?.chat(response.content);
       }
     } catch(err: any) {
       console.error(`[mineAI Agent Error]`, err.message);
@@ -122,7 +151,7 @@ export class MineAIAgent {
 
   private async executeTool(name: string, args: any) {
     console.log(`[mineAI Agent] Executing Tool: ${name}`, args);
-    const bot = this.manager.bot;
+    const bot = this.bot;
     if (!bot) return;
 
     try {
@@ -141,7 +170,6 @@ export class MineAIAgent {
       }
     } catch (err: any) {
       console.error(`[mineAI Tool Error] ${err}`);
-      // In a full implementation, feed this error back to the LLM for recovery.
     }
   }
 }

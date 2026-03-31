@@ -8,6 +8,8 @@ export interface MineAIConfig {
     api_key: string;
     model: string;
     systemPrompt: string;
+    userPrompt: string;
+    triggerWord: string;
   };
   minecraft: {
     host: string;
@@ -21,10 +23,12 @@ const CONFIG_PATH = path.join(process.cwd(), "config.yaml");
 
 const DEFAULT_CONFIG: MineAIConfig = {
   llm: {
-    provider: "openai",
+    provider: "groq",
     api_key: "",
-    model: "gpt-4o",
+    model: "llama-3.3-70b-versatile",
     systemPrompt: "You are mineAI, an intelligent Minecraft agent. Use your tools to perform actions.",
+    userPrompt: "",
+    triggerWord: "rose",
   },
   minecraft: {
     host: "localhost",
@@ -40,9 +44,29 @@ export function loadConfig(): MineAIConfig {
     return DEFAULT_CONFIG;
   }
   const fileParams = fs.readFileSync(CONFIG_PATH, "utf-8");
-  return yaml.parse(fileParams) as MineAIConfig;
+  const parsed = yaml.parse(fileParams) as Partial<MineAIConfig>;
+
+  // Merge with defaults to ensure new fields exist even on old configs
+  return {
+    llm: { ...DEFAULT_CONFIG.llm, ...parsed.llm },
+    minecraft: { ...DEFAULT_CONFIG.minecraft, ...parsed.minecraft },
+  };
 }
 
 export function saveConfig(config: MineAIConfig) {
   fs.writeFileSync(CONFIG_PATH, yaml.stringify(config));
+}
+
+/**
+ * Return config with API key redacted — safe to send over HTTP.
+ */
+export function loadConfigRedacted(): Omit<MineAIConfig, "llm"> & { llm: Omit<MineAIConfig["llm"], "api_key"> & { api_key: string } } {
+  const config = loadConfig();
+  return {
+    ...config,
+    llm: {
+      ...config.llm,
+      api_key: config.llm.api_key ? "••••••••" + config.llm.api_key.slice(-4) : "",
+    },
+  };
 }

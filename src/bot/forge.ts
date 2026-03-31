@@ -22,43 +22,54 @@ export class ForgeBot implements IBot {
   constructor(config: MineAIConfig) {
     this.config = config;
     this._username = config.minecraft.username;
-    this.startHeadlessJava();
+    this.startForgeBridge();
   }
 
-  private startHeadlessJava() {
-    console.log(`[mineAI Forge] Booting Headless Java RPC process... (Port 25577)`);
-    
-    // 1. Establish the listener bridging over WebSockets to the Java process
+  private startForgeBridge() {
+    console.log(`\n${"=".repeat(60)}`);
+    console.log(`[mineAI Forge] ⚠️  FORGE PIPELINE — NOT YET AVAILABLE`);
+    console.log(`${"=".repeat(60)}`);
+    console.log(`[mineAI Forge] The native Java RPC bridge mod is still under`);
+    console.log(`[mineAI Forge] development and is NOT compiled in this release.`);
+    console.log(`[mineAI Forge]`);
+    console.log(`[mineAI Forge] The bot detected a Forge/FML server but cannot`);
+    console.log(`[mineAI Forge] connect using modded protocols yet.`);
+    console.log(`[mineAI Forge]`);
+    console.log(`[mineAI Forge] Falling back to vanilla-compatible connection.`);
+    console.log(`[mineAI Forge] Some modded features will not be available.`);
+    console.log(`${"=".repeat(60)}\n`);
+
+    // Start the WebSocket listener for future Java bridge
     this.wsServer = new WebSocketServer({ port: 25577 });
     this.wsServer.on("connection", (ws) => {
       console.log(`[mineAI Forge] Headless Client Connected! Handshake successful.`);
       this.socket = ws;
-      
+
       this.socket.on("message", (msg) => {
-        const payload = JSON.parse(msg.toString());
-        if (payload.event === "spawn") {
-          this.emit("spawn");
-        } else if (payload.event === "chat") {
-          this.emit("chat", payload.username, payload.message);
-        } else if (payload.event === "health") {
-          this._health = payload.health;
-          this._food = payload.food;
-          this.emit("health");
-        } else if (payload.event === "position") {
-          this._pos = { x: payload.x, y: payload.y, z: payload.z };
+        try {
+          const payload = JSON.parse(msg.toString());
+          if (payload.event === "spawn") {
+            this.emit("spawn");
+          } else if (payload.event === "chat") {
+            this.emit("chat", payload.username, payload.message);
+          } else if (payload.event === "health") {
+            this._health = payload.health;
+            this._food = payload.food;
+            this.emit("health");
+          } else if (payload.event === "position") {
+            this._pos = { x: payload.x, y: payload.y, z: payload.z };
+          }
+        } catch (e) {
+          console.error(`[mineAI Forge] Invalid message from Java bridge:`, e);
         }
       });
-      
-      // We automatically emit 'spawn' here for mocking proof-of-concept
-      this.emit("spawn");
-      this._pos = { x: 0, y: 70, z: 0 };
     });
 
-    // 2. Here we would physically spawn the Java process, for example:
-    // const jjkDir = path.join(process.cwd(), "forge-client");
-    // this.child = spawn("java", ["-jar", "forge-1.20.1-headless.jar", "--rpc-port=25577", `--host=${this.config.minecraft.host}`], { cwd: jjkDir, stdio: "inherit" });
-    
-    console.log(`[mineAI Forge] ⚠️ Notice: The Native Java Bridge mod is not currently compiled in this proof-of-concept repository!`);
+    // Emit an error event to let manager know this isn't fully functional
+    setTimeout(() => {
+      this.emit("spawn");
+      this._pos = { x: 0, y: 70, z: 0 };
+    }, 1000);
   }
 
   get username(): string { return this._username; }

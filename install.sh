@@ -95,6 +95,12 @@ main() {
   log "Building mineAI"
   npm run build
 
+  log "Installing dashboard dependencies"
+  (cd dashboard && npm install --no-fund --no-audit --loglevel=error)
+
+  log "Building dashboard"
+  (cd dashboard && npm run build)
+
   printf '\n==> Build finished. Next: onboarding will open interactively.\n' >&2
   printf '==> If the terminal looks idle for a moment, wait — the prompt is loading.\n\n' >&2
   log "Launching mineAI onboarding"

@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 import { loadConfig, saveConfig, MineAIConfig } from "../storage/config.js";
 
 export async function onboard() {
-  console.log("Welcome to mineAI Onboarding Wizard! 🌹\n");
+  console.log("\n🌹 Welcome to mineAI Onboarding Wizard!\n");
   const config = loadConfig();
 
   const answers = await inquirer.prompt([
@@ -14,6 +14,7 @@ export async function onboard() {
         { name: "Groq (recommended — free & fast)", value: "groq" },
         { name: "OpenAI", value: "openai" },
         { name: "Google Gemini (WIP — not fully supported yet)", value: "gemini" },
+        { name: "Anthropic (Claude)", value: "anthropic" },
       ],
       default: config.llm.provider ?? "groq",
     },
@@ -29,11 +30,18 @@ export async function onboard() {
       message: "Which model do you want to use?",
       choices: (answers: { provider: string }) => {
         if (answers.provider === "openai") return ["gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"];
-        if (answers.provider === "gemini") return ["gemini-1.5-pro", "gemini-1.5-flash"];
+        if (answers.provider === "gemini") return ["gemini-2.0-flash", "gemini-2.5-flash-preview-04-17", "gemini-1.5-pro"];
         if (answers.provider === "groq") return ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768", "gemma2-9b-it"];
+        if (answers.provider === "anthropic") return ["claude-sonnet-4-20250514", "claude-3-5-haiku-20241022"];
         return [];
       },
       default: config.llm.model,
+    },
+    {
+      type: "input",
+      name: "triggerWord",
+      message: "What trigger word should the bot respond to?",
+      default: config.llm.triggerWord ?? "rose",
     },
     {
       type: "input",
@@ -68,6 +76,7 @@ export async function onboard() {
   config.llm.provider = answers.provider;
   config.llm.api_key = answers.api_key;
   config.llm.model = answers.model;
+  config.llm.triggerWord = answers.triggerWord;
   
   config.minecraft.host = answers.host;
   config.minecraft.port = answers.port;
@@ -76,5 +85,6 @@ export async function onboard() {
 
   saveConfig(config);
   console.log("\n✅ Configuration saved to config.yaml!");
-  console.log("You can now start the bot using: npm run start");
+  console.log("You can now start the bot using: mineai start");
+  console.log("Dashboard will be available at: http://localhost:8080\n");
 }
