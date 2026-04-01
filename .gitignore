@@ -41,3 +41,6 @@ forge-companion/build/
 forge-companion/.gradle/
 forge-companion/run/
 forge-companion/run-data/
+
+.mineai/
+mineai.log

@@ -3,6 +3,7 @@ import { Command } from "commander";
 import path from "path";
 import fs from "fs";
 import { execSync } from "child_process";
+import { isPidAlive } from "./daemon.js";
 
 const program = new Command();
 
@@ -77,8 +78,15 @@ program
   .action(() => {
     const PID_FILE = path.join(process.cwd(), ".mineai", "mineai.pid");
     if (fs.existsSync(PID_FILE)) {
-        const pid = fs.readFileSync(PID_FILE, "utf-8").trim();
-        console.log(`🟢 mineAI is running in the background (PID: ${pid}).`);
+        const pid = parseInt(fs.readFileSync(PID_FILE, "utf-8").trim(), 10);
+        if (Number.isFinite(pid) && isPidAlive(pid)) {
+            console.log(`🟢 mineAI is running in the background (PID: ${pid}).`);
+        } else {
+            try {
+                fs.unlinkSync(PID_FILE);
+            } catch {}
+            console.log(`🔴 mineAI is not currently running.`);
+        }
     } else {
         console.log(`🔴 mineAI is not currently running.`);
     }

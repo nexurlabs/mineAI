@@ -2,9 +2,6 @@ import { BotManager } from "../bot/manager.js";
 import { LLMClient } from "./llm.js";
 import { MineAIConfig } from "../storage/config.js";
 import { IBot } from "../bot/types.js";
-import pkg from "mineflayer-pathfinder";
-
-const { goals } = pkg;
 
 /**
  * Built-in system prompt — always prepended before user prompt.
@@ -86,26 +83,28 @@ export class MineAIAgent {
     this.llm = new LLMClient(config);
     this.config = config;
 
-    // Event-based: wait for the bot to be ready instead of a fragile setTimeout
+    const attachToBot = (bot: IBot) => {
+      if ((bot as any).__mineAIChatHooked) return;
+      this.bot = bot;
+      (bot as any).__mineAIChatHooked = true;
+      console.log(`[mineAI Agent] Brain attached to bot pipeline.`);
+
+      bot.on("chat", async (username, message) => {
+        if (!this.config.llm.enableChat) return;
+        if (username === bot.username) return;
+        const trigger = this.config.llm.triggerWord || "rose";
+        if (message.toLowerCase().includes(trigger.toLowerCase())) {
+          await this.processGoal(message);
+        }
+      });
+    };
+
     if (manager.bot) {
-      this.attachToBot(manager.bot);
+      attachToBot(manager.bot);
     }
+
     manager.on("ready", (bot: IBot) => {
-      this.attachToBot(bot);
-    });
-  }
-
-  private attachToBot(bot: IBot) {
-    this.bot = bot;
-    console.log(`[mineAI Agent] Brain attached to bot pipeline.`);
-
-    bot.on("chat", async (username, message) => {
-      if (!this.config.llm.enableChat) return; // Feature disabled for safety
-      if (username === bot.username) return;
-      const trigger = this.config.llm.triggerWord || "rose";
-      if (message.toLowerCase().includes(trigger.toLowerCase())) {
-        await this.processGoal(message);
-      }
+      attachToBot(bot);
     });
   }
 

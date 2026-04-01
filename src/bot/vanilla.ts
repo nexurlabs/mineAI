@@ -1,8 +1,13 @@
 import mineflayer from "mineflayer";
-import { pathfinder, Movements, goals } from "mineflayer-pathfinder";
-import { plugin as pvp } from "mineflayer-pvp";
+import pathfinderPkg from "mineflayer-pathfinder";
 import { plugin as collectBlock } from "mineflayer-collectblock";
 import armorManager from "mineflayer-armor-manager";
+
+const { pathfinder, Movements, goals } = pathfinderPkg as typeof pathfinderPkg & {
+  pathfinder: typeof import("mineflayer-pathfinder").pathfinder;
+  Movements: typeof import("mineflayer-pathfinder").Movements;
+  goals: typeof import("mineflayer-pathfinder").goals;
+};
 import { IBot, Position } from "./types.js";
 import { MineAIConfig } from "../storage/config.js";
 import { broadcastState } from "../web/ws.js";
@@ -19,7 +24,6 @@ export class VanillaBot implements IBot {
     });
 
     this.bot.loadPlugin(pathfinder);
-    this.bot.loadPlugin(pvp);
     this.bot.loadPlugin(collectBlock);
     this.bot.loadPlugin(armorManager);
 
@@ -65,7 +69,7 @@ export class VanillaBot implements IBot {
   async attackEntity(entityName: string): Promise<void> {
     const target = this.bot.nearestEntity((entity) => entity.name?.toLowerCase() === entityName.toLowerCase());
     if (target) {
-      this.bot.pvp.attack(target);
+      this.bot.attack(target);
     } else {
       throw new Error(`Couldn't find entity: ${entityName}`);
     }
